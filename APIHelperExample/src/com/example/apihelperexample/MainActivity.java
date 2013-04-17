@@ -51,7 +51,23 @@ public class MainActivity extends Activity {
 		
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.d(LOG_TAG, "! message received : "+intent.getStringExtra(APIHelper.EXTRA_MESSAGE));
+			String msg = intent.getStringExtra(APIHelper.EXTRA_MESSAGE);
+			
+			Log.d(LOG_TAG, "! message received : "+msg);
+			
+			if(msg.equals(APIHelper.MSG_SUCCESS)) {
+				Log.d(LOG_TAG, "! Success");
+				Log.d(LOG_TAG, "@ APIHelper.sJsonResult = "+APIHelper.sJsonResult);
+			} else if(msg.equals(APIHelper.MSG_HTTP_FAILURE)){
+				Log.d(LOG_TAG, "! HTTP failure");
+				Log.d(LOG_TAG, "@ APIHelper.sJsonResult = "+APIHelper.sJsonResult);
+			} else if(msg.equals(APIHelper.MSG_API_FAILURE)) {
+				Log.d(LOG_TAG, "! API failure");
+				Log.d(LOG_TAG, "@ APIHelper.sJsonResult = "+APIHelper.sJsonResult);
+			} else if(msg.equals(APIHelper.MSG_JSON_FAILURE)) {
+				Log.d(LOG_TAG, "! JSON failure");
+				Log.d(LOG_TAG, "@ APIHelper.sJsonResult = "+APIHelper.sJsonResult);
+			}
 		}
 	};
 

@@ -28,16 +28,14 @@ public class APIHelper {
 	
 	//TODO: minimize duplicated code between public api methods
 	
-	public static JSONObject sJsonGet = null;
-	public static JSONObject sJsonPost = null;
-	public static JSONObject sJsonPut = null;
-	public static JSONObject sJsonDelete = null;
-	
 	public static final String EXTRA_MESSAGE = "extraMessage";
+	
 	public static final String MSG_SUCCESS = "msgSuccess";
 	public static final String MSG_HTTP_FAILURE = "msgHttpFailure";
 	public static final String MSG_API_FAILURE = "msgApiFailure";
 	public static final String MSG_JSON_FAILURE = "msgJsonFailure";
+	
+	public static JSONObject sJsonResult = null;
 	
 	private static final String LOG_TAG = "APIHelper";
 	
@@ -83,7 +81,7 @@ public class APIHelper {
 		jsonObject = getJsonFromString(result);
 		
 		if(jsonObject != null) {
-			sJsonGet = jsonObject;
+			sJsonResult = jsonObject;
 			sendMessage(context, filterName, MSG_SUCCESS);
 		} else {
 			sendMessage(context, filterName, MSG_JSON_FAILURE);
@@ -129,7 +127,7 @@ public class APIHelper {
 		jsonObject = getJsonFromString(result);
 		
 		if(jsonObject != null) {
-			sJsonPost = jsonObject;
+			sJsonResult = jsonObject;
 			sendMessage(context, filterName, MSG_SUCCESS);
 		} else {
 			sendMessage(context, filterName, MSG_JSON_FAILURE);
@@ -175,7 +173,7 @@ public class APIHelper {
 		jsonObject = getJsonFromString(result);
 		
 		if(jsonObject != null) {
-			sJsonPut = jsonObject;
+			sJsonResult = jsonObject;
 			sendMessage(context, filterName, MSG_SUCCESS);
 		} else {
 			sendMessage(context, filterName, MSG_JSON_FAILURE);
@@ -220,7 +218,7 @@ public class APIHelper {
 		jsonObject = getJsonFromString(result);
 		
 		if(jsonObject != null) {
-			sJsonPut = jsonObject;
+			sJsonResult = jsonObject;
 			sendMessage(context, filterName, MSG_SUCCESS);
 		} else {
 			sendMessage(context, filterName, MSG_JSON_FAILURE);
