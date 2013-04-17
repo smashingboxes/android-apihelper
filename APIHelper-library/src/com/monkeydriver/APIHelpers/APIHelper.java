@@ -137,7 +137,7 @@ public class APIHelper {
 	}
 	
 	/**
-	 * PUTs to a URL and broadcasts and event on result.
+	 * PUTs to a URL and broadcasts an event on result.
 	 * @param context
 	 * @param filterName
 	 * @param urlStr
@@ -182,6 +182,13 @@ public class APIHelper {
 		}
 	}
 	
+	/**
+	 * DELETEs to a URL and broadcasts an event on result.
+	 * @param context
+	 * @param filterName
+	 * @param urlStr
+	 * @param params
+	 */
 	public static void apiDelete(Context context, String filterName, String urlStr, ArrayList<NameValuePair> params) {
 		InputStream inputStream = null;
 		String result = null;
