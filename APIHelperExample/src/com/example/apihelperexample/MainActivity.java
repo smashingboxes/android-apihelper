@@ -60,10 +60,11 @@ public class MainActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			String msg = intent.getStringExtra(APIHelper.EXTRA_MESSAGE);
 			
-			Log.d(LOG_TAG, "! message received : "+msg);
-			
 			if(msg.equals(APIHelper.MSG_SUCCESS)) {
 				Log.d(LOG_TAG, "! Success");
+				Log.d(LOG_TAG, "@ APIHelper.sJsonResult = "+APIHelper.sJsonResult);
+			} else if(msg.equals(APIHelper.MSG_NO_CONNECTIVITY)) {
+				Log.d(LOG_TAG, "! No connectivity");
 				Log.d(LOG_TAG, "@ APIHelper.sJsonResult = "+APIHelper.sJsonResult);
 			} else if(msg.equals(APIHelper.MSG_HTTP_FAILURE)){
 				Log.d(LOG_TAG, "! HTTP failure");

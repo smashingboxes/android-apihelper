@@ -31,6 +31,7 @@ public class APIHelper {
 	public static final String EXTRA_MESSAGE = "extraMessage";
 	
 	public static final String MSG_SUCCESS = "msgSuccess";
+	public static final String MSG_NO_CONNECTIVITY = "msgNoConnectivity";
 	public static final String MSG_HTTP_FAILURE = "msgHttpFailure";
 	public static final String MSG_API_FAILURE = "msgApiFailure";
 	public static final String MSG_JSON_FAILURE = "msgJsonFailure";
@@ -47,6 +48,11 @@ public class APIHelper {
 	 * @param params
 	 */
 	public static void apiGet(Context context, String filterName, String urlStr, ArrayList<NameValuePair> params) {
+		if(!NetworkStatusHelper.isNetworkConnected(context)) {
+			handleNoConnectivity(context, filterName);
+			return;
+		}
+		
 		InputStream inputStream = null;
 		String result = null;
 		JSONObject jsonObject = null;
@@ -96,6 +102,11 @@ public class APIHelper {
 	 * @param params
 	 */
 	public static void apiPost(Context context, String filterName, String urlStr, ArrayList<NameValuePair> params) {
+		if(!NetworkStatusHelper.isNetworkConnected(context)) {
+			handleNoConnectivity(context, filterName);
+			return;
+		}
+		
 		InputStream inputStream = null;
 		String result = null;
 		JSONObject jsonObject = null;
@@ -142,6 +153,11 @@ public class APIHelper {
 	 * @param params
 	 */
 	public static void apiPut(Context context, String filterName, String urlStr, ArrayList<NameValuePair> params) {
+		if(!NetworkStatusHelper.isNetworkConnected(context)) {
+			handleNoConnectivity(context, filterName);
+			return;
+		}
+		
 		InputStream inputStream = null;
 		String result = null;
 		JSONObject jsonObject = null;
@@ -188,6 +204,11 @@ public class APIHelper {
 	 * @param params
 	 */
 	public static void apiDelete(Context context, String filterName, String urlStr, ArrayList<NameValuePair> params) {
+		if(!NetworkStatusHelper.isNetworkConnected(context)) {
+			handleNoConnectivity(context, filterName);
+			return;
+		}
+		
 		InputStream inputStream = null;
 		String result = null;
 		JSONObject jsonObject = null;
@@ -266,6 +287,11 @@ public class APIHelper {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	private static void handleNoConnectivity(Context context, String filterName) {
+		Log.d(LOG_TAG,"No connection found");
+		sendMessage(context, filterName, MSG_NO_CONNECTIVITY);
 	}
 	
 	/**

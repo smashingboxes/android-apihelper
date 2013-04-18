@@ -9,3 +9,8 @@ How to:
 * Create a BroadcastReceiver, where necessary, to listen for results.
 * Pass a url and parameters to an api method.
 * See example project for details.
+
+Future:
+
+* Funnel all calls through a gatekeeper method to reduce duplicated code.
+* Set up a queue to handle gaps in connectivity.
