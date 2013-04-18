@@ -37,6 +37,13 @@ public class MainActivity extends Activity {
 		testApiGet();
 	}
 	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+	}
+	
 	private void testApiGet() {
 		ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("include_entities", "true"));
