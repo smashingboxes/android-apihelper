@@ -14,3 +14,11 @@ Future:
 
 * Funnel all calls through a gatekeeper method to reduce duplicated code.
 * Set up a queue to handle gaps in connectivity.
+
+---
+
+Next
+
+* Listen for network status change.  Use that to set a boolean in NetworkStatusHelper.
+* If no network, queue.
+* If network returns, run queue.

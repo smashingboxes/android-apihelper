@@ -4,8 +4,9 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-
 public class NetworkStatusHelper {
+	
+	public static boolean isNetworkConnected = true;
 
 	/**
 	 * Returns true if device is connected to a network, false if device is not connected to a network.
@@ -17,10 +18,16 @@ public class NetworkStatusHelper {
 		NetworkInfo activeNetwork = conMgr.getActiveNetworkInfo();
 		
 		if(activeNetwork != null && activeNetwork.isConnected()) {
-			return true;
+			isNetworkConnected = true;
 		} else {
-			return false;
+			isNetworkConnected = false;
 		}
+		
+		return isNetworkConnected;
+	}
+	
+	public static void handleConnectivityChange(Context context) {
+		isNetworkConnected(context);
 	}
 	
 }

@@ -26,8 +26,6 @@ import android.util.Log;
 
 public class APIHelper {
 	
-	//TODO: minimize duplicated code between public api methods
-	
 	public static final String EXTRA_MESSAGE = "extraMessage";
 	
 	public static final String MSG_SUCCESS = "msgSuccess";
@@ -40,6 +38,13 @@ public class APIHelper {
 	
 	private static final String LOG_TAG = "APIHelper";
 	
+	private static final String TYPE_GET = "typeGet";
+	private static final String TYPE_POST = "typePost";
+	private static final String TYPE_PUT = "typePut";
+	private static final String TYPE_DELETE = "typeDelete";
+	
+	private static ArrayList<APICall> mQueuedApiCalls = null;
+	
 	/**
 	 * GETs to a URL and broadcasts an event on result.
 	 * @param context
@@ -47,9 +52,14 @@ public class APIHelper {
 	 * @param urlStr
 	 * @param params
 	 */
-	public static void apiGet(Context context, String filterName, String urlStr, ArrayList<NameValuePair> params) {
+	public static void apiGet(	Context context,
+								String filterName,
+								String urlStr,
+								ArrayList<NameValuePair> params,
+								boolean doQueueIfBlocked) {
+		
 		if(!NetworkStatusHelper.isNetworkConnected(context)) {
-			handleNoConnectivity(context, filterName);
+			handleNoConnectivity(TYPE_GET, context, filterName, urlStr, params, doQueueIfBlocked);
 			return;
 		}
 		
@@ -101,9 +111,14 @@ public class APIHelper {
 	 * @param urlStr
 	 * @param params
 	 */
-	public static void apiPost(Context context, String filterName, String urlStr, ArrayList<NameValuePair> params) {
+	public static void apiPost(	Context context,
+								String filterName,
+								String urlStr,
+								ArrayList<NameValuePair> params,
+								boolean doQueueIfBlocked) {
+		
 		if(!NetworkStatusHelper.isNetworkConnected(context)) {
-			handleNoConnectivity(context, filterName);
+			handleNoConnectivity(TYPE_POST, context, filterName, urlStr, params, doQueueIfBlocked);
 			return;
 		}
 		
@@ -152,9 +167,14 @@ public class APIHelper {
 	 * @param urlStr
 	 * @param params
 	 */
-	public static void apiPut(Context context, String filterName, String urlStr, ArrayList<NameValuePair> params) {
+	public static void apiPut(	Context context,
+								String filterName,
+								String urlStr,
+								ArrayList<NameValuePair> params,
+								boolean doQueueIfBlocked) {
+		
 		if(!NetworkStatusHelper.isNetworkConnected(context)) {
-			handleNoConnectivity(context, filterName);
+			handleNoConnectivity(TYPE_PUT, context, filterName, urlStr, params, doQueueIfBlocked);
 			return;
 		}
 		
@@ -203,9 +223,14 @@ public class APIHelper {
 	 * @param urlStr
 	 * @param params
 	 */
-	public static void apiDelete(Context context, String filterName, String urlStr, ArrayList<NameValuePair> params) {
+	public static void apiDelete(	Context context,
+									String filterName,
+									String urlStr,
+									ArrayList<NameValuePair> params,
+									boolean doQueueIfBlocked) {
+		
 		if(!NetworkStatusHelper.isNetworkConnected(context)) {
-			handleNoConnectivity(context, filterName);
+			handleNoConnectivity(TYPE_DELETE, context, filterName, urlStr, params, doQueueIfBlocked);
 			return;
 		}
 		
@@ -289,8 +314,16 @@ public class APIHelper {
 		}
 	}
 	
-	private static void handleNoConnectivity(Context context, String filterName) {
+	private static void handleNoConnectivity(	String callType,
+												Context context,
+												String filterName,
+												String urlStr,
+												ArrayList<NameValuePair> params,
+												boolean doQueueIfBlocked) {
 		Log.d(LOG_TAG,"No connection found");
+		if(doQueueIfBlocked) {
+			addApiCallToQueue(callType, context, filterName, urlStr, params);
+		}
 		sendMessage(context, filterName, MSG_NO_CONNECTIVITY);
 	}
 	
@@ -317,6 +350,42 @@ public class APIHelper {
 		intent.putExtra(EXTRA_MESSAGE, msg);
 		
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+	}
+	
+	/**
+	 * Adds an API call to the queue.
+	 * @param callType
+	 * @param context
+	 * @param filterName
+	 * @param msg
+	 */
+	private static void addApiCallToQueue(String callType, Context context, String filterName, String urlStr, ArrayList<NameValuePair> params) {
+		if(mQueuedApiCalls == null) {
+			mQueuedApiCalls = new ArrayList<APICall>();
+		}
+		
+		APICall apiCall = new APICall(callType, context, filterName, urlStr, params);
+		
+		mQueuedApiCalls.add(apiCall);
+	}
+	
+	@SuppressWarnings("unused")
+	private static class APICall {
+		
+		public String callType = null;
+		public Context context = null;
+		public String filterName = null;
+		public String urlStr = null;
+		public ArrayList<NameValuePair> params = null;
+		
+		public APICall(String callType, Context context, String filterName, String urlStr, ArrayList<NameValuePair> params) {
+			this.callType = callType;
+			this.context = context;
+			this.filterName = filterName;
+			this.urlStr = urlStr;
+			this.params = params;
+		}
+		
 	}
 	
 }

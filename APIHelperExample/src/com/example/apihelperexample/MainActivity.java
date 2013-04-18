@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
 		params.add(new BasicNameValuePair("screen_name", "smashing777"));
 		params.add(new BasicNameValuePair("count", "1"));
 		
-		APIHelper.apiGet(this, FILTER_NAME, API_URL, params);
+		APIHelper.apiGet(this, FILTER_NAME, API_URL, params, false);
 	}
 	
 	private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
