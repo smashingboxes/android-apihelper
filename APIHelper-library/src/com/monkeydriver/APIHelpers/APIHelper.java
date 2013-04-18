@@ -19,12 +19,15 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 public class APIHelper {
+	
+	//TODO: alert if connectivity lost and call queued
 	
 	public static final String EXTRA_MESSAGE = "extraMessage";
 	
@@ -38,10 +41,10 @@ public class APIHelper {
 	
 	private static final String LOG_TAG = "APIHelper";
 	
-	private static final String TYPE_GET = "typeGet";
-	private static final String TYPE_POST = "typePost";
-	private static final String TYPE_PUT = "typePut";
-	private static final String TYPE_DELETE = "typeDelete";
+	private static final int TYPE_GET = 301;
+	private static final int TYPE_POST = 302;
+	private static final int TYPE_PUT = 303;
+	private static final int TYPE_DELETE = 304;
 	
 	private static ArrayList<APICall> mQueuedApiCalls = null;
 	
@@ -272,6 +275,39 @@ public class APIHelper {
 	}
 	
 	/**
+	 * Iterates through and runs queued API calls.
+	 */
+	public static void runQueue() {
+		if(mQueuedApiCalls != null && mQueuedApiCalls.size() > 0) {
+			for(APICall apiCall : mQueuedApiCalls) {
+				switch(apiCall.callType) {
+				
+				case TYPE_GET:
+					apiGet(apiCall.context, apiCall.filterName, apiCall.urlStr, apiCall.params, true);
+					break;
+					
+				case TYPE_POST:
+					apiPost(apiCall.context, apiCall.filterName, apiCall.urlStr, apiCall.params, true);
+					break;
+					
+				case TYPE_PUT:
+					apiPut(apiCall.context, apiCall.filterName, apiCall.urlStr, apiCall.params, true);
+					break;
+					
+				case TYPE_DELETE:
+					apiDelete(apiCall.context, apiCall.filterName, apiCall.urlStr, apiCall.params, true);
+					break;
+				
+				}
+			}
+			//TODO: timeout between each call
+			//TODO: remove each call as made
+			//TODO: ability to stop running the queue (in case of loss of connectivity)
+			mQueuedApiCalls = null;
+		}
+	}
+	
+	/**
 	 * Converts and returns String from API response.
 	 * @param inputStream
 	 * @return
@@ -314,7 +350,7 @@ public class APIHelper {
 		}
 	}
 	
-	private static void handleNoConnectivity(	String callType,
+	private static void handleNoConnectivity(	int callType,
 												Context context,
 												String filterName,
 												String urlStr,
@@ -359,7 +395,7 @@ public class APIHelper {
 	 * @param filterName
 	 * @param msg
 	 */
-	private static void addApiCallToQueue(String callType, Context context, String filterName, String urlStr, ArrayList<NameValuePair> params) {
+	private static void addApiCallToQueue(int callType, Context context, String filterName, String urlStr, ArrayList<NameValuePair> params) {
 		if(mQueuedApiCalls == null) {
 			mQueuedApiCalls = new ArrayList<APICall>();
 		}
@@ -372,13 +408,13 @@ public class APIHelper {
 	@SuppressWarnings("unused")
 	private static class APICall {
 		
-		public String callType = null;
+		public int callType = 0;
 		public Context context = null;
 		public String filterName = null;
 		public String urlStr = null;
 		public ArrayList<NameValuePair> params = null;
 		
-		public APICall(String callType, Context context, String filterName, String urlStr, ArrayList<NameValuePair> params) {
+		public APICall(int callType, Context context, String filterName, String urlStr, ArrayList<NameValuePair> params) {
 			this.callType = callType;
 			this.context = context;
 			this.filterName = filterName;

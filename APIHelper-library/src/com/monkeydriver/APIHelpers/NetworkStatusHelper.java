@@ -27,7 +27,9 @@ public class NetworkStatusHelper {
 	}
 	
 	public static void handleConnectivityChange(Context context) {
-		isNetworkConnected(context);
+		if(isNetworkConnected(context)) {
+			APIHelper.runQueue();
+		}
 	}
 	
 }
