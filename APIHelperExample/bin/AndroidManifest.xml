@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         
-        <receiver
+s        <receiver
             android:name="com.monkeydriver.APIHelpers.ConnectivityReceiver"
             android:enabled="true" >
             <intent-filter>
