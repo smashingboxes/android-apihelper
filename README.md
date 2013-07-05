@@ -17,7 +17,6 @@ Future:
 
 ---
 
-
 Next
 
 * Listen for network status change.  Use that to set a boolean in NetworkStatusHelper.

@@ -30,6 +30,7 @@ public class APIHelper {
 	//TODO: alert if connectivity lost and call queued
 	
 	public static final String EXTRA_MESSAGE = "extraMessage";
+	public static final String EXTRA_JSON = "extraJson";
 	
 	public static final String MSG_SUCCESS = "msgSuccess";
 	public static final String MSG_NO_CONNECTIVITY = "msgNoConnectivity";
@@ -93,17 +94,15 @@ public class APIHelper {
 		result = getStringFromResponse(inputStream);
 		
 		if(result == null) {
-			sendMessage(context, filterName, MSG_API_FAILURE);
+			sendMessage(context, filterName, MSG_API_FAILURE, null);
 			return;
 		} 
-		
 		jsonObject = getJsonFromString(result);
 		
 		if(jsonObject != null) {
-			sJsonResult = jsonObject;
-			sendMessage(context, filterName, MSG_SUCCESS);
+			sendMessage(context, filterName, MSG_SUCCESS, result);
 		} else {
-			sendMessage(context, filterName, MSG_JSON_FAILURE);
+			sendMessage(context, filterName, MSG_JSON_FAILURE, null);
 		}
 	}
 	
@@ -149,7 +148,7 @@ public class APIHelper {
 		result = getStringFromResponse(inputStream);
 		
 		if(result == null) {
-			sendMessage(context, filterName, MSG_API_FAILURE);
+			sendMessage(context, filterName, MSG_API_FAILURE, null);
 			return;
 		}
 		
@@ -157,9 +156,9 @@ public class APIHelper {
 		
 		if(jsonObject != null) {
 			sJsonResult = jsonObject;
-			sendMessage(context, filterName, MSG_SUCCESS);
+			sendMessage(context, filterName, MSG_SUCCESS, result);
 		} else {
-			sendMessage(context, filterName, MSG_JSON_FAILURE);
+			sendMessage(context, filterName, MSG_JSON_FAILURE, null);
 		}
 	}
 	
@@ -205,7 +204,7 @@ public class APIHelper {
 		result = getStringFromResponse(inputStream);
 		
 		if(result == null) {
-			sendMessage(context, filterName, MSG_API_FAILURE);
+			sendMessage(context, filterName, MSG_API_FAILURE, null);
 			return;
 		}
 		
@@ -213,9 +212,9 @@ public class APIHelper {
 		
 		if(jsonObject != null) {
 			sJsonResult = jsonObject;
-			sendMessage(context, filterName, MSG_SUCCESS);
+			sendMessage(context, filterName, MSG_SUCCESS, result);
 		} else {
-			sendMessage(context, filterName, MSG_JSON_FAILURE);
+			sendMessage(context, filterName, MSG_JSON_FAILURE, null);
 		}
 	}
 	
@@ -260,7 +259,7 @@ public class APIHelper {
 		result = getStringFromResponse(inputStream);
 		
 		if(result == null) {
-			sendMessage(context, filterName, MSG_API_FAILURE);
+			sendMessage(context, filterName, MSG_API_FAILURE, null);
 			return;
 		}
 		
@@ -268,9 +267,9 @@ public class APIHelper {
 		
 		if(jsonObject != null) {
 			sJsonResult = jsonObject;
-			sendMessage(context, filterName, MSG_SUCCESS);
+			sendMessage(context, filterName, MSG_SUCCESS, result);
 		} else {
-			sendMessage(context, filterName, MSG_JSON_FAILURE);
+			sendMessage(context, filterName, MSG_JSON_FAILURE, null);
 		}
 	}
 	
@@ -280,31 +279,43 @@ public class APIHelper {
 	public static void runQueue() {
 		if(mQueuedApiCalls != null && mQueuedApiCalls.size() > 0) {
 			for(APICall apiCall : mQueuedApiCalls) {
-				switch(apiCall.callType) {
-				
-				case TYPE_GET:
-					apiGet(apiCall.context, apiCall.filterName, apiCall.urlStr, apiCall.params, true);
-					break;
+				if(NetworkStatusHelper.isNetworkConnected) {
+					switch(apiCall.callType) {
 					
-				case TYPE_POST:
-					apiPost(apiCall.context, apiCall.filterName, apiCall.urlStr, apiCall.params, true);
-					break;
+					case TYPE_GET:
+						apiGet(apiCall.context, apiCall.filterName, apiCall.urlStr, apiCall.params, true);
+						break;
+						
+					case TYPE_POST:
+						apiPost(apiCall.context, apiCall.filterName, apiCall.urlStr, apiCall.params, true);
+						break;
+						
+					case TYPE_PUT:
+						apiPut(apiCall.context, apiCall.filterName, apiCall.urlStr, apiCall.params, true);
+						break;
+						
+					case TYPE_DELETE:
+						apiDelete(apiCall.context, apiCall.filterName, apiCall.urlStr, apiCall.params, true);
+						break;
 					
-				case TYPE_PUT:
-					apiPut(apiCall.context, apiCall.filterName, apiCall.urlStr, apiCall.params, true);
-					break;
+					}
 					
-				case TYPE_DELETE:
-					apiDelete(apiCall.context, apiCall.filterName, apiCall.urlStr, apiCall.params, true);
+					mQueuedApiCalls.remove(apiCall);
+				} else {
 					break;
-				
 				}
 			}
-			//TODO: timeout between each call
-			//TODO: remove each call as made
-			//TODO: ability to stop running the queue (in case of loss of connectivity)
-			mQueuedApiCalls = null;
+			
+			//TODO: timeout between each call?
+			
+			if(mQueuedApiCalls.size() == 0) {
+				mQueuedApiCalls = null;
+			}
 		}
+	}
+	
+	public static void pauseQueue() {
+		
 	}
 	
 	/**
@@ -336,7 +347,7 @@ public class APIHelper {
 	 * @param str
 	 * @return
 	 */
-	private static JSONObject getJsonFromString(String str) {
+	public static JSONObject getJsonFromString(String str) {
 		Log.d(LOG_TAG, str);
 		JSONObject jsonObject = null;
 		
@@ -360,7 +371,7 @@ public class APIHelper {
 		if(doQueueIfBlocked) {
 			addApiCallToQueue(callType, context, filterName, urlStr, params);
 		}
-		sendMessage(context, filterName, MSG_NO_CONNECTIVITY);
+		sendMessage(context, filterName, MSG_NO_CONNECTIVITY, null);
 	}
 	
 	/**
@@ -372,7 +383,7 @@ public class APIHelper {
 	private static void handleHttpError(Context context, String filterName, Exception e) {
 		Log.d(LOG_TAG,"Error in http connection " + e.toString());
 		e.printStackTrace();
-		sendMessage(context, filterName, MSG_HTTP_FAILURE);
+		sendMessage(context, filterName, MSG_HTTP_FAILURE, null);
 	}
 	
 	/**
@@ -381,9 +392,10 @@ public class APIHelper {
 	 * @param msg
 	 * @param value
 	 */
-	private static void sendMessage(Context context, String filterName, String msg) {
+	private static void sendMessage(Context context, String filterName, String msg, String jsonStr) {
 		Intent intent = new Intent(filterName);
 		intent.putExtra(EXTRA_MESSAGE, msg);
+		intent.putExtra(EXTRA_JSON, jsonStr);
 		
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 	}
@@ -400,9 +412,7 @@ public class APIHelper {
 			mQueuedApiCalls = new ArrayList<APICall>();
 		}
 		
-		APICall apiCall = new APICall(callType, context, filterName, urlStr, params);
-		
-		mQueuedApiCalls.add(apiCall);
+		mQueuedApiCalls.add(new APICall(callType, context, filterName, urlStr, params));
 	}
 	
 	@SuppressWarnings("unused")

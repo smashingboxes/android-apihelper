@@ -29,6 +29,8 @@ public class NetworkStatusHelper {
 	public static void handleConnectivityChange(Context context) {
 		if(isNetworkConnected(context)) {
 			APIHelper.runQueue();
+		} else {
+			APIHelper.pauseQueue();
 		}
 	}
 	
